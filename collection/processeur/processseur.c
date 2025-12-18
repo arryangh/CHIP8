@@ -191,7 +191,7 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }  
                 
-                case 0xE: { //8xy7 = SHL Vx = = shift left: décallage du bit de registre Vx à gauche, Vf prend le bit pérdu
+                case 0xE: { //8xyE = SHL Vx = = shift left: décallage du bit de registre Vx à gauche, Vf prend le bit pérdu
                     cpu->Vx[0xF] = (cpu->Vx[x] & 0x80) >> 7;
                     cpu->Vx[x] <<= 1;
                     break;
@@ -210,7 +210,7 @@ void cpu_cycle(CPU *cpu)
             
             
             switch(n){
-                case 0x65: {
+                case 0x65: { //Fx65 = LIR Vx = load from I to register 
                     for (int i=0; i<=x; i++){
                         cpu->Vx[i] = ram_read(cpu->ram, cpu->I + i); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
                     }
@@ -218,7 +218,7 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }
                 
-                case 0x55: {
+                case 0x55: { //Fx55 = LRI Vx = load register at location I
                     for (int i=0; i<=x; i++){
                         ram_write(cpu->ram, cpu->I + i, cpu->Vx[i]); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
                     }                    
@@ -226,15 +226,17 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }
                 
-                case 0x33: {
-                    
-                    
+                case 0x33: { //Fx33 = CRD Vx = convert register in decimal. ex: 11111111 => 256
+                    uint8_t value = cpu->Vx[x];  // Valeur à convertir
+    
+                    ram_write(cpu->ram, cpu->I + 0, value / 100); // centaines
+                    ram_write(cpu->ram, cpu->I + 1, (value / 10) % 10); // dixaines
+                    ram_write(cpu->ram, cpu->I + 2, value % 10);  // unités
                     break;
                 }
                 
-                case 0x1E: {
-                    
-                    
+                case 0x1E: { //Fx1E = ARI Vx = add register to I: fait I + valeur(Vx[x])
+                    cpu->I += cpu->Vx[x];
                     break;
                 }           
 
