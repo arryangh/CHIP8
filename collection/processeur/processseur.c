@@ -168,12 +168,83 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }
                 
+                case 4: { //8xy4 = ADD Vx,Vy = Vx prend "Vx + Vy"
+                    cpu->Vx[x] += cpu->Vx[y];
+                    break;
+                }   
+             
+                case 5: { //8xy5 = SUB Vx,Vn = Vx prend "Vx + Vy"
+                    cpu->Vx[x] -= cpu->Vx[y];
+                    break;
+                }   
+ 
+                case 6: { //8xy6 = SHR Vx = shift right: décallage du bit de registre Vx à droite, Vf prend le bit pérdu
+                    uint8_t x = (opcode & 0x0F00) >> 8; //Le bit de poids faible est sauvegardé dans VF
+                    cpu->Vx[0xF] = cpu->Vx[x] & 0x01;  // VF = bit LSB (bit 0)
+                    cpu->Vx[x] = cpu->Vx[x] >> 1; // Décalage à droite de Vx 
+                    break;
+                }  
                 
+                case 7: { //8xy7 = SBU Vx,Vy = Vx prend "Vy - Vx"
+                    cpu->Vx[0xF] = (cpu->Vx[y] >= cpu->Vx[x]);
+                    cpu->Vx[x] = cpu->Vx[y] - cpu->Vx[x];
+                    break;
+                }  
+                
+                case 0xE: { //8xy7 = SHL Vx = = shift left: décallage du bit de registre Vx à gauche, Vf prend le bit pérdu
+                    cpu->Vx[0xF] = (cpu->Vx[x] & 0x80) >> 7;
+                    cpu->Vx[x] <<= 1;
+                    break;
+                }  
                 
                 default:
                     break;
             }
 
+            break;
+        }
+        
+        case 0xF000: {
+            uint8_t x = (opcode & 0x0F00) >> 8;
+            uint8_t n = (opcode & 0x00FF); //distinguer Fx65, Fx55, Fx55, Fx33, Fx1E
+            
+            
+            switch(n){
+                case 0x65: {
+                    for (int i=0; i<=x; i++){
+                        cpu->Vx[i] = ram_read(cpu->ram, cpu->I + i); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
+                    }
+                    
+                    break;
+                }
+                
+                case 0x55: {
+                    for (int i=0; i<=x; i++){
+                        ram_write(cpu->ram, cpu->I + i, cpu->Vx[i]); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
+                    }                    
+                    
+                    break;
+                }
+                
+                case 0x33: {
+                    
+                    
+                    break;
+                }
+                
+                case 0x1E: {
+                    
+                    
+                    break;
+                }           
+
+     
+                default:
+                    break;
+            }
+            
+            
+            break;
         }
         
         

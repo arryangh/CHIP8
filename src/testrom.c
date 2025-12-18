@@ -37,8 +37,8 @@ int testrom()
 
     for (uint16_t addr = START_ADDRESS; addr < 4096; addr += 2)
     {
-        uint8_t hi = ram_read(ram, addr, NULL);
-        uint8_t lo = ram_read(ram, addr + 1, NULL);
+        uint8_t hi = ram_read(ram, addr);
+        uint8_t lo = ram_read(ram, addr + 1);
 
         // si la ROM est terminée (00 00 → instruction vide), on arrête
         if (hi == 0 && lo == 0)

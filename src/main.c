@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     int running = 1;
     SDL_Event event;
     
-    int i = 0;
+    //int i = 0;
     
     while (running) {
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
         /* ===== CPU ===== */
         cpu_cycle(&cpu);
-        i++;
+        //i++;
         // printf("i=%d", i);
 
         /* ===== AFFICHAGE ===== */
