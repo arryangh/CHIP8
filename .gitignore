@@ -1,0 +1,21 @@
+# Build
+build/
+Debug/
+Release/
+*.o
+*.obj
+*.exe
+
+# CodeLite
+.codelite/
+*.workspace
+*.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# dossier libprovided 
+libprovided_2025/
+cach
