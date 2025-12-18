@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     RAM *ram = ram_create();
 
     rom_in_load(
-        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\1-chip8-logo.ch8",
+        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\1-chip8-logo.ch8",
         ram,
         DEBUT_MEMOIRE
     );
@@ -66,11 +66,17 @@ int main(int argc, char *argv[])
 
     int running = 1;
     SDL_Event event;
-
+    
+    int i = 0;
+    
     while (running) {
 
         /* ===== GESTION DES ÉVÉNEMENTS ===== */
-        while (SDL_PollEvent(&event)) {
+        
+        /*
+         * le gestionnaire d'évènement SDL attend un évènement 
+         * */
+        while (SDL_PollEvent(&event)) { // pour éviter le bug de curseur de la souris (logo chargement)
             if (event.type == SDL_QUIT) {
                 running = 0;
             }
@@ -78,6 +84,8 @@ int main(int argc, char *argv[])
 
         /* ===== CPU ===== */
         cpu_cycle(&cpu);
+        i++;
+        printf("i=%d", i);
 
         /* ===== AFFICHAGE ===== */
         Display_update(&display);
