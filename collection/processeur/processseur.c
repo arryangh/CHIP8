@@ -1,5 +1,13 @@
 #include "processeur/processeur.h"
 
+
+
+static uint64_t last_timer_tick = 0;
+
+
+
+
+
 void cpu_cycle(CPU *cpu)
 {
     uint8_t high, low;
@@ -156,16 +164,19 @@ void cpu_cycle(CPU *cpu)
                 
                 case 1: { //8xy1 = OR Vx,Vy = Vx prend "Vx | Vy"
                     cpu->Vx[x] |= cpu->Vx[y];
+                    cpu->Vx[0XF] = 0; // pour valider vF RESET TEST du rom6 
                     break;
                 }
                 
                 case 2: { //8xy2 = AND Vx,Vy = Vx prend "Vx & Vy"
                     cpu->Vx[x] &= cpu->Vx[y];
+                    cpu->Vx[0XF] = 0; // pour valider vF RESET TEST du rom6
                     break;
                 }
                 
                 case 3: { //8xy3 = XOR Vx,Vy = Vx prend "Vx & Vy"
                     cpu->Vx[x] ^= cpu->Vx[y];
+                    cpu->Vx[0XF] = 0; // pour valider vF RESET TEST du rom6
                     break;
                 }
                 
@@ -225,6 +236,7 @@ void cpu_cycle(CPU *cpu)
                 case 0x65: { //Fx65 = LIR Vx = load from I to register 
                     for (int i=0; i<=x; i++){
                         cpu->Vx[i] = ram_read(cpu->ram, cpu->I + i); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
+                        // cpu->I += x + 1; //pour valider MEMORY TEST de rom6
                     }
                     
                     break;
@@ -233,6 +245,7 @@ void cpu_cycle(CPU *cpu)
                 case 0x55: { //Fx55 = LRI Vx = load register at location I
                     for (int i=0; i<=x; i++){
                         ram_write(cpu->ram, cpu->I + i, cpu->Vx[i]); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
+                        // cpu->I += x + 1; //pour valider MEMORY TEST de rom6
                     }                    
                     
                     break;
@@ -333,6 +346,23 @@ void cpu_cycle(CPU *cpu)
         
         default:
             break;   
+    }
+    
+    
+    
+    
+     // pour le timer, 60Hz, on décremente CPU.DT 60 fois par seconde
+    uint64_t now = SDL_GetTicks64();
+    
+    
+    if (now - last_timer_tick >= 16) { // ≈ 60 Hz
+        if (cpu->DT > 0)
+            cpu->DT--;
+
+        if (cpu->ST > 0)
+            cpu->ST--;
+
+        last_timer_tick = now;
     }
 
 }

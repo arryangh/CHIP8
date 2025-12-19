@@ -9,6 +9,8 @@
 #include "keyboard/keyboard.h"
 
 
+
+
 int main(int argc, char *argv[])
 {
     RAM *ram = ram_create();
@@ -18,10 +20,10 @@ int main(int argc, char *argv[])
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\2-ibm-logo.ch8", //02 
         //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\3-corax+.ch8",  //03
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\4-flags.ch8", //04
-        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\5-quirks.ch8",
-        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8",
-        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\7-beep.ch8",
-        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\8-scrolling.ch8",
+        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\5-quirks.ch8", //05
+        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
+        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\7-beep.ch8", //07
+        // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\8-scrolling.ch8", //08
         ram,
         DEBUT_MEMOIRE
     );
@@ -45,7 +47,7 @@ int main(int argc, char *argv[])
     int running = 1;
     SDL_Event event;
     
-    //int i = 0;
+    int i = 0;
     
     while (running) {
 
@@ -62,8 +64,11 @@ int main(int argc, char *argv[])
 
         /* ===== CPU ===== */
         cpu_cycle(&cpu);
-        //i++;
-        // printf("i=%d", i);
+        i++;
+        if (i%24 == 0){
+            printf("\n");
+        }
+            
 
         /* ===== AFFICHAGE ===== */
         Display_update(&display);
