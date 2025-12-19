@@ -9,7 +9,8 @@ void cpu_cycle(CPU *cpu)
     low  = ram_read(cpu->ram, cpu->PC + 1);
 
     uint16_t opcode = ((uint16_t)high << 8) | low;
-    // printf("opcode= %4X\n", opcode);
+    //printf("opcode= %4X\n", opcode);
+    printf("%4X ", opcode);
 
     /* instruction suivante par défaut */
     cpu->PC += 2;
@@ -30,7 +31,7 @@ void cpu_cycle(CPU *cpu)
         }
 
 
-        /* ===== 6xnn : LD Vx, byte ===== */
+        /* ===== 6xkk : LD Vx, byte ===== */
         case 0x6000: {
             uint8_t x  = (opcode & 0x0F00) >> 8;
             uint8_t nn =  opcode & 0x00FF;
@@ -250,7 +251,34 @@ void cpu_cycle(CPU *cpu)
                     cpu->I += cpu->Vx[x];
                     break;
                 }           
+                
+                case 0x0A: { // Fx0A = LD Vx, K
+                    uint8_t key;
 
+                    if (Keyboard_wait(cpu->keyboard, &key) == 0) {
+                        cpu->Vx[x] = key;
+                    }
+
+                    break;
+                }
+                
+                        
+                case 0x18: // Fx18 : LRS Vx = Load Vx into Sound Timer 
+                    cpu->ST = cpu->Vx[x];
+                    break;
+                    
+                case 0x07: // Fx07 : LTR Vx = Load Delay Timer into Vx 
+                    cpu->Vx[x] = cpu->DT;
+                    break;
+                    
+                case 0x15: // Fx15 : LRT Vx = Load Vx into Delay Timer 
+                    cpu->DT = cpu->Vx[x];
+                    break;
+
+                case 0x29: //Fx29 : LSI Vx = Load sprite address for digit Vx into I
+                    cpu->I = cpu->Vx[x] * 5;  // chaque sprite 5 octets (0-F)
+                    break;
+     
      
                 default:
                     break;
@@ -260,7 +288,44 @@ void cpu_cycle(CPU *cpu)
             break;
         }
         
+        case 0xE000: {
+            uint8_t x = (opcode & 0x0F00) >> 8;
+            uint8_t key = cpu->Vx[x];
+            int state;
+
+            switch (opcode & 0x00FF) {
+
+                /* Ex9E : SKP Vx */
+                case 0x9E:
+                    if (Keyboard_get(cpu->keyboard, key, &state) == 0 &&
+                        state == KEY_DOWN) {
+                        cpu->PC += 2;
+                    }
+                    break;
+
+                /* ExA1 : SKNP Vx */
+                case 0xA1:
+                    if (Keyboard_get(cpu->keyboard, key, &state) == 0 &&
+                        state == KEY_UP) {
+                        cpu->PC += 2;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+        }
         
+        case 0xC000: {  // RND Vx, kk
+            uint8_t x  = (opcode & 0x0F00) >> 8;
+            uint8_t kk = opcode & 0x00FF;
+
+            uint8_t rnd = rand() % 256;  // générer un entier aléatoire 0..255
+            cpu->Vx[x] = rnd & kk;
+
+            break;
+        }
         
         
         
