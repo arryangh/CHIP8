@@ -168,32 +168,43 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }
                 
-                case 4: { //8xy4 = ADD Vx,Vy = Vx prend "Vx + Vy"
-                    cpu->Vx[x] += cpu->Vx[y];
+                case 4: { // 8xy4 : ADD Vx, Vy
+                    uint8_t vx = cpu->Vx[x];
+                    uint8_t vy = cpu->Vx[y];
+                    uint16_t sum = vx + vy;
+                    cpu->Vx[x]   = sum & 0xFF;      // Résultat d'abord
+                    cpu->Vx[0xF] = (sum > 0xFF);    // Flag ensuite
                     break;
-                }   
+                }
+  
              
-                case 5: { //8xy5 = SUB Vx,Vn = Vx prend "Vx + Vy"
-                    cpu->Vx[x] -= cpu->Vx[y];
+                case 5: { // 8xy5 : SUB Vx, Vy
+                    uint8_t vx = cpu->Vx[x];
+                    uint8_t vy = cpu->Vx[y];
+                    cpu->Vx[x]   = vx - vy;         // Résultat d'abord
+                    cpu->Vx[0xF] = (vx >= vy);      // NOT borrow ensuite
                     break;
                 }   
  
                 case 6: { //8xy6 = SHR Vx = shift right: décallage du bit de registre Vx à droite, Vf prend le bit pérdu
-                    uint8_t x = (opcode & 0x0F00) >> 8; //Le bit de poids faible est sauvegardé dans VF
-                    cpu->Vx[0xF] = cpu->Vx[x] & 0x01;  // VF = bit LSB (bit 0)
-                    cpu->Vx[x] = cpu->Vx[x] >> 1; // Décalage à droite de Vx 
+                    uint8_t lsb = cpu->Vx[x] & 0x01;  // Sauvegarder le bit perdu
+                    cpu->Vx[x] = cpu->Vx[x] >> 1;     // Résultat d'abord
+                    cpu->Vx[0xF] = lsb;                // Flag ensuite
                     break;
                 }  
                 
-                case 7: { //8xy7 = SBU Vx,Vy = Vx prend "Vy - Vx"
-                    cpu->Vx[0xF] = (cpu->Vx[y] >= cpu->Vx[x]);
-                    cpu->Vx[x] = cpu->Vx[y] - cpu->Vx[x];
+                case 7: {
+                    uint8_t vx = cpu->Vx[x];
+                    uint8_t vy = cpu->Vx[y];
+                    cpu->Vx[x]   = vy - vx;         // Résultat d'abord
+                    cpu->Vx[0xF] = (vy >= vx);      // NOT borrow ensuite
                     break;
-                }  
+                } 
                 
                 case 0xE: { //8xyE = SHL Vx = = shift left: décallage du bit de registre Vx à gauche, Vf prend le bit pérdu
-                    cpu->Vx[0xF] = (cpu->Vx[x] & 0x80) >> 7;
-                    cpu->Vx[x] <<= 1;
+                    uint8_t msb = (cpu->Vx[x] & 0x80) >> 7;  // Sauvegarder le bit perdu
+                    cpu->Vx[x] <<= 1;                         // Résultat d'abord
+                    cpu->Vx[0xF] = msb;                       // Flag ensuite
                     break;
                 }  
                 
