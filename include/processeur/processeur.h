@@ -13,11 +13,6 @@ void processeurFonction();
 #define STACK_SIZE 16
 
 typedef struct {
-    
-    int waiting_for_key; //état ajouté au CPU pour éviter de blocker le thread (rom6, test3)
-    uint8_t waiting_reg;
-    uint8_t pressed_key;
-    
     uint8_t  Vx[16];
     uint16_t I;
     uint16_t PC;

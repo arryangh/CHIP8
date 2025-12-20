@@ -4,12 +4,22 @@
 
 static uint64_t last_timer_tick = 0;
 
+static void cpu_update_timers_with_delta(CPU *cpu, uint64_t delta_ms){ // pour rom7, test3, NO HATLER
+    // 60 Hz ≈ 16.666 ms
+    uint64_t ticks = delta_ms / 16;
 
+    for (uint64_t i = 0; i < ticks; i++) {
+        if (cpu->DT > 0)
+            cpu->DT--;
+        if (cpu->ST > 0)
+            cpu->ST--;
+    }
+}
 
 
 
 void cpu_cycle(CPU *cpu)
-{
+{    
     uint8_t high, low;
 
     /* ================= FETCH ================= */
@@ -274,10 +284,18 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }           
                 
-                case 0x0A: { // Fx0A = LD Vx, K
+                case 0x0A: { // Fx0A = LD Vx, K (blocking + delta compensation)
                     uint8_t key;
 
-                    if (Keyboard_wait(cpu->keyboard, &key) == 0) { //bloque le thread et les timers qui se mettent à jours en bas sont gelés
+                    uint64_t start = SDL_GetTicks64();   // ⏱ avant attente
+
+                    if (Keyboard_wait(cpu->keyboard, &key) == 0) {
+                        uint64_t end = SDL_GetTicks64(); // ⏱ après attente
+                        uint64_t delta = end - start;
+
+                        // 💡 rattraper le temps perdu pour les timers
+                        cpu_update_timers_with_delta(cpu, delta);
+
                         cpu->Vx[x] = key;
                     }
 
@@ -370,7 +388,7 @@ void cpu_cycle(CPU *cpu)
     uint64_t now = SDL_GetTicks64();
     
     
-    if (now - last_timer_tick >= 14) { // ≈ 60 Hz
+    if (now - last_timer_tick >= 16) { // ≈ 60 Hz
         if (cpu->DT > 0)
             cpu->DT--;
 
