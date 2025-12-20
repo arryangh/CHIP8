@@ -52,11 +52,21 @@ void cpu_cycle(CPU *cpu)
             cpu->I = opcode & 0x0FFF;
             break;
         }
+        
         /* ===== Dxyn : DRW ===== */
-        case 0xD000: {
+        case 0xD000: { // DRW
             uint8_t x = (opcode & 0x0F00) >> 8;
             uint8_t y = (opcode & 0x00F0) >> 4;
             uint8_t n =  opcode & 0x000F;
+
+            // Attendre le prochain V-Blank (60 Hz)
+            static uint64_t last_draw = 0;
+            uint64_t now = SDL_GetTicks64();
+            
+            if (now - last_draw < 16) {  // 16ms = 60 Hz
+                SDL_Delay(16 - (now - last_draw));
+            }
+            last_draw = SDL_GetTicks64();
 
             struct Sprite sprite;
             Sprite_init(&sprite, n);
@@ -198,11 +208,10 @@ void cpu_cycle(CPU *cpu)
                     break;
                 }   
  
-                case 6: { //8xy6 = SHR Vx = shift right: décallage du bit de registre Vx à droite, Vf prend le bit pérdu
-                    uint8_t lsb = cpu->Vx[x] & 0x01;  // Sauvegarder le bit perdu
-                    cpu->Vx[x] = cpu->Vx[x] >> 1;     // Résultat d'abord
-                    cpu->Vx[0xF] = lsb;                // Flag ensuite
-                    break;
+                case 6: { //8xy6 = SHR Vx, Vy = shift right (CHIP-8 original)
+                    uint8_t lsb = cpu->Vx[y] & 0x01;  // Bit perdu de Vy
+                    cpu->Vx[x] = cpu->Vx[y] >> 1;     // Vx = Vy décalé à droite
+                    cpu->Vx[0xF] = lsb;                // Flag avec le bit perdu
                 }  
                 
                 case 7: {
@@ -213,10 +222,10 @@ void cpu_cycle(CPU *cpu)
                     break;
                 } 
                 
-                case 0xE: { //8xyE = SHL Vx = = shift left: décallage du bit de registre Vx à gauche, Vf prend le bit pérdu
-                    uint8_t msb = (cpu->Vx[x] & 0x80) >> 7;  // Sauvegarder le bit perdu
-                    cpu->Vx[x] <<= 1;                         // Résultat d'abord
-                    cpu->Vx[0xF] = msb;                       // Flag ensuite
+                case 0xE: { //8xyE = SHL Vx, Vy = shift left (CHIP-8 original)
+                    uint8_t msb = (cpu->Vx[y] & 0x80) >> 7;  // Bit perdu de Vy
+                    cpu->Vx[x] = cpu->Vx[y] << 1;             // Vx = Vy décalé à gauche
+                    cpu->Vx[0xF] = msb;                       // Flag avec le bit perdu
                     break;
                 }  
                 
@@ -236,8 +245,8 @@ void cpu_cycle(CPU *cpu)
                 case 0x65: { //Fx65 = LIR Vx = load from I to register 
                     for (int i=0; i<=x; i++){
                         cpu->Vx[i] = ram_read(cpu->ram, cpu->I + i); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
-                        // cpu->I += x + 1; //pour valider MEMORY TEST de rom6
                     }
+                    cpu->I += x + 1; //pour valider MEMORY TEST de rom6
                     
                     break;
                 }
@@ -245,9 +254,9 @@ void cpu_cycle(CPU *cpu)
                 case 0x55: { //Fx55 = LRI Vx = load register at location I
                     for (int i=0; i<=x; i++){
                         ram_write(cpu->ram, cpu->I + i, cpu->Vx[i]); //de Vx[0] à Vx[x] est chargé par ce qu'il y a dans mémoire à l'adresse I+0 à I+x
-                        // cpu->I += x + 1; //pour valider MEMORY TEST de rom6
+                        
                     }                    
-                    
+                    cpu->I += x + 1; //pour valider MEMORY TEST de rom6
                     break;
                 }
                 
@@ -268,7 +277,7 @@ void cpu_cycle(CPU *cpu)
                 case 0x0A: { // Fx0A = LD Vx, K
                     uint8_t key;
 
-                    if (Keyboard_wait(cpu->keyboard, &key) == 0) {
+                    if (Keyboard_wait(cpu->keyboard, &key) == 0) { //bloque le thread et les timers qui se mettent à jours en bas sont gelés
                         cpu->Vx[x] = key;
                     }
 
@@ -340,6 +349,12 @@ void cpu_cycle(CPU *cpu)
             break;
         }
         
+        /* ===== Bnnn : JP V0, addr ===== */
+        case 0xB000: {
+            cpu->PC = (opcode & 0x0FFF) + cpu->Vx[0];
+            break;
+        }
+        
         
         
         
@@ -355,7 +370,7 @@ void cpu_cycle(CPU *cpu)
     uint64_t now = SDL_GetTicks64();
     
     
-    if (now - last_timer_tick >= 16) { // ≈ 60 Hz
+    if (now - last_timer_tick >= 14) { // ≈ 60 Hz
         if (cpu->DT > 0)
             cpu->DT--;
 

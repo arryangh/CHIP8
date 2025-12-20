@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\2-ibm-logo.ch8", //02 
         //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\3-corax+.ch8",  //03
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\4-flags.ch8", //04
-        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\5-quirks.ch8", //05
-        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
+        // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\5-quirks.ch8", //05
+        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
         //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\7-beep.ch8", //07
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\8-scrolling.ch8", //08
         ram,
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         /* ===== AFFICHAGE ===== */
         Display_update(&display);
 
-        SDL_Delay(2);
+        //SDL_Delay(1);
     }
 
     /* ===== NETTOYAGE ===== */
