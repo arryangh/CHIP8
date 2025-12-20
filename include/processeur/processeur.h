@@ -6,6 +6,7 @@
 #include "ram/ram.h"
 #include "display/display.h"
 #include "keyboard/keyboard.h"
+#include "speaker/speaker.h"
 
 void processeurFonction();
 
@@ -26,6 +27,7 @@ typedef struct {
     RAM *ram;
     struct Display *display;
     struct Keyboard *keyboard;
+    struct Speaker *speaker; //ajoute de speaker
 } CPU;
 
 

@@ -4,7 +4,8 @@
 
 static uint64_t last_timer_tick = 0;
 
-static void cpu_update_timers_with_delta(CPU *cpu, uint64_t delta_ms){ // pour rom7, test3, NO HATLER
+// pour rom7, test3, NO HATLER
+static void cpu_update_timers_with_delta(CPU *cpu, uint64_t delta_ms){ 
     // 60 Hz ≈ 16.666 ms
     uint64_t ticks = delta_ms / 16;
 
@@ -388,12 +389,17 @@ void cpu_cycle(CPU *cpu)
     uint64_t now = SDL_GetTicks64();
     
     
-    if (now - last_timer_tick >= 16) { // ≈ 60 Hz
+    if (now - last_timer_tick >= 14) { // 60 Hz ≈ 16 ms
+
         if (cpu->DT > 0)
             cpu->DT--;
 
-        if (cpu->ST > 0)
+        if (cpu->ST > 0) { //tant que ST > 0 on fait beep (et on décremente ST)
             cpu->ST--;
+            Speaker_on(cpu->speaker);   //BEEP ON
+        } else {
+            Speaker_off(cpu->speaker);  //BEEP OFF
+        }
 
         last_timer_tick = now;
     }

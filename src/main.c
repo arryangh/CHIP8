@@ -7,6 +7,7 @@
 #include "testrom.h"
 #include "processeur/processeur.h"
 #include "keyboard/keyboard.h"
+#include "speaker/speaker.h"
 
 
 
@@ -21,8 +22,8 @@ int main(int argc, char *argv[])
         //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\3-corax+.ch8",  //03
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\4-flags.ch8", //04
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\5-quirks.ch8", //05
-        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
-        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\7-beep.ch8", //07
+        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
+        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\7-beep.ch8", //07
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\8-scrolling.ch8", //08
         ram,
         DEBUT_MEMOIRE
@@ -35,6 +36,11 @@ int main(int argc, char *argv[])
     struct Keyboard keyboard;
     Keyboard_init(&keyboard);
     
+    //ajoute de speaker 
+    struct Speaker speaker; 
+    Speaker_init(&speaker);
+    
+    
     
 
     CPU cpu = {0};
@@ -43,6 +49,9 @@ int main(int argc, char *argv[])
     cpu.PC = DEBUT_MEMOIRE;
     cpu.SP = 0;
     cpu.keyboard = &keyboard;
+    
+    // ajoute de speaker
+    cpu.speaker = &speaker;
 
     int running = 1;
     SDL_Event event;
