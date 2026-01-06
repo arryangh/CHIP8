@@ -223,6 +223,7 @@ void cpu_cycle(CPU *cpu)
                     uint8_t lsb = cpu->Vx[y] & 0x01;  // Bit perdu de Vy
                     cpu->Vx[x] = cpu->Vx[y] >> 1;     // Vx = Vy décalé à droite
                     cpu->Vx[0xF] = lsb;                // Flag avec le bit perdu
+                    break;
                 }  
                 
                 case 7: {
