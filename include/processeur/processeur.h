@@ -14,20 +14,20 @@ void processeurFonction();
 #define STACK_SIZE 16
 
 typedef struct {
-    uint8_t  Vx[16];
-    uint16_t I;
-    uint16_t PC;
-    
-    uint8_t DT;
-    uint8_t ST;
-
-    uint16_t stack[STACK_SIZE];
+    uint8_t  Vx[16]; //registres généraux (16 * 16bit)
+    uint16_t I; // registre d'adresse (16bits)
+    uint16_t PC; // compteur de programme (16bits)
+    uint8_t DT; // Delay timer (8bits)
+    uint8_t ST; // Sound timer (8bits)
+    uint16_t stack[STACK_SIZE]; // Pile (16 * 16bits)
     uint8_t  SP;
 
-    RAM *ram;
+    RAM *ram; // RAM (4096 * 8bits)
+    
+    // périphériques
     struct Display *display;
     struct Keyboard *keyboard;
-    struct Speaker *speaker; //ajoute de speaker
+    struct Speaker *speaker; 
 } CPU;
 
 
