@@ -4,14 +4,14 @@
 
 RAM* ram_create(){
     //err1: création de RAM échoue
-    RAM* ram = malloc(RAM_SIZE * sizeof(uint8_t)); //RAM_SIZE: constante défini dans ram.h
+    RAM* ram = malloc(RAM_SIZE * sizeof(uint8_t)); //RAM_SIZE=4096: constante défini dans ram.h
     if (ram == NULL){
         printf("ram_create(): malloc échoué pour créer le struct RAM");
         return NULL;
     }
     
     //err2: création de memory pour RAM échoue
-    ram->memory = malloc(RAM_SIZE);
+    ram->memory = malloc(RAM_SIZE * sizeof(uint8_t)); // = 4096 * 1
     if (ram->memory == NULL){
         free(ram); //remonter et libérer struct RAM
         printf("ram_create(): malloc échoué pour créer le memory pour struct RAM");

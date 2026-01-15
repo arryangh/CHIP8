@@ -7,7 +7,7 @@ static uint64_t last_timer_tick = 0;
 // pour rom7, test3, NO HATLER
 static void cpu_update_timers_with_delta(CPU *cpu, uint64_t delta_ms){ 
     // 60 Hz ≈ 16.666 ms
-    uint64_t ticks = delta_ms / 16;
+    uint64_t ticks = delta_ms / 16; // faire DT-- toutes les 16,6ms (delta_ms/16ms) = nombre de décrementation manqué = ticks
 
     for (uint64_t i = 0; i < ticks; i++) {
         if (cpu->DT > 0)
@@ -19,31 +19,23 @@ static void cpu_update_timers_with_delta(CPU *cpu, uint64_t delta_ms){
 
 
 
-void cpu_cycle(CPU *cpu)
-{    
+void cpu_cycle(CPU *cpu){   
+    /* ================= FETCH ================= */ 
     uint8_t high, low;
-
-    /* ================= FETCH ================= */
     high = ram_read(cpu->ram, cpu->PC);
     low  = ram_read(cpu->ram, cpu->PC + 1);
-
     uint16_t opcode = ((uint16_t)high << 8) | low;
-    //printf("opcode= %4X\n", opcode);
-    printf("%4X ", opcode);
-
-    /* instruction suivante par défaut */
     cpu->PC += 2;
-
+    
     /* ================= DECODE / EXECUTE ================= */
     switch (opcode & 0xF000) {
-
         /* ===== 00E0 : CLS ===== */
         case 0x0000:{
             if (opcode == 0x00E0) {
                 Display_CLS(cpu->display);
             } else if (opcode == 0x00EE) {
                 /* RET - Retour de sous-programme */
-                cpu->SP--;
+                cpu->SP--; // SP = Stack Pointer = Pointeur de pile (uint_8)
                 cpu->PC = cpu->stack[cpu->SP];
             }
             break;
@@ -51,7 +43,7 @@ void cpu_cycle(CPU *cpu)
 
 
         /* ===== 6xkk : LD Vx, byte ===== */
-        case 0x6000: {
+        case 0x6000: { 
             uint8_t x  = (opcode & 0x0F00) >> 8;
             uint8_t nn =  opcode & 0x00FF;
             cpu->Vx[x] = nn;
@@ -288,19 +280,15 @@ void cpu_cycle(CPU *cpu)
                 
                 case 0x0A: { // Fx0A = LD Vx, K (blocking + delta compensation)
                     uint8_t key;
-
-                    uint64_t start = SDL_GetTicks64();   // ⏱ avant attente
-
+                    uint64_t start = SDL_GetTicks64();   // avant attente
                     if (Keyboard_wait(cpu->keyboard, &key) == 0) {
-                        uint64_t end = SDL_GetTicks64(); // ⏱ après attente
+                        uint64_t end = SDL_GetTicks64(); // après attente
                         uint64_t delta = end - start;
-
-                        // 💡 rattraper le temps perdu pour les timers
+                        
+                        // rattraper le temps perdu pour les timers
                         cpu_update_timers_with_delta(cpu, delta);
-
                         cpu->Vx[x] = key;
                     }
-
                     break;
                 }
                 
@@ -375,33 +363,25 @@ void cpu_cycle(CPU *cpu)
             break;
         }
         
-        
-        
-        
-        
         default:
             break;   
     }
     
     
     
-    
-     // pour le timer, 60Hz, on décremente CPU.DT 60 fois par seconde
+    // la décrementation de DT et ST basique (-1 toutes les 16ms)
+    // pour le timer, 60Hz, on décremente cpu->DT 60 fois par seconde
     uint64_t now = SDL_GetTicks64();
-    
-    
     if (now - last_timer_tick >= 14) { // 60 Hz ≈ 16 ms
-
         if (cpu->DT > 0)
             cpu->DT--;
 
         if (cpu->ST > 0) { //tant que ST > 0 on fait beep (et on décremente ST)
             cpu->ST--;
             Speaker_on(cpu->speaker);   //BEEP ON
-        } else {
+        } else { // si cpu->ST == 0
             Speaker_off(cpu->speaker);  //BEEP OFF
         }
-
         last_timer_tick = now;
     }
 

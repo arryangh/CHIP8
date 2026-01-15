@@ -1,16 +1,11 @@
 #ifndef RAM_H //condition pour assurer un include unique
 #define RAM_H
 
-
-
 #include <stdio.h>
 #include <stdint.h> //pour uint8_t
 
-
-
 #define RAM_SIZE 4096       // 4 KB de RAM
 #define DEBUT_MEMOIRE 0x200 // 512
-
 
 typedef struct{
     uint8_t *memory;

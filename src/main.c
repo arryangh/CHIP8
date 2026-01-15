@@ -15,12 +15,12 @@ void run(){
     RAM *ram = ram_create();
 
     rom_in_load(
-         "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\1-chip8-logo.ch8", //01
+        // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\1-chip8-logo.ch8", //01
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\2-ibm-logo.ch8", //02 
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\3-corax+.ch8",  //03
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\4-flags.ch8", //04
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\5-quirks.ch8", //05
-        // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
+        "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\6-keypad.ch8", //06
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\7-beep.ch8", //07
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\8-scrolling.ch8", //08
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\Maze (alt) [David Winter, 199x].ch8", //maze game
@@ -28,6 +28,8 @@ void run(){
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\games\\Tetris [Fran Dachille, 1991].ch8",
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\games\\Vertical Brix [Paul Robson, 1996].ch8",
         // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\games\\ZeroPong [zeroZshadow, 2007].ch8",
+        //"C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\games\\Blitz [David Winter].ch8",
+        // "C:\\Users\\ARYAN\\CodeLiteProjects\\CHIP8-WORKSPACE\\.chip8files\\games\\15 Puzzle [Roger Ivie].ch8",
         ram,
         DEBUT_MEMOIRE
     );
@@ -57,7 +59,7 @@ void run(){
     int running = 1;
     SDL_Event event;
     
-    int i = 0;
+    // int i = 0;
     
     while (running) {
 
@@ -76,11 +78,12 @@ void run(){
         cpu_cycle(&cpu);
         
         // pour affichage propre des insturctions en hexadecimal dans le terminal
+        /*
         i++;
         if (i%24 == 0){ // nouvelle ligne toutes les 24 instructions
             printf("\n");
         }
-            
+        */
 
         /* ===== AFFICHAGE ===== */
         Display_update(&display);
@@ -98,9 +101,7 @@ void run(){
 
 
 int main(int argc, char *argv[]){
-
     run();
-    
     return 0;
 }
 

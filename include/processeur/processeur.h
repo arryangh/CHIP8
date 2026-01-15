@@ -8,7 +8,7 @@
 #include "keyboard/keyboard.h"
 #include "speaker/speaker.h"
 
-void processeurFonction();
+
 
 #define VX_SIZE 16
 #define STACK_SIZE 16
