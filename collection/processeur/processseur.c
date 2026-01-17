@@ -29,6 +29,15 @@ void cpu_cycle(CPU *cpu){
     
     /* ================= DECODE / EXECUTE ================= */
     switch (opcode & 0xF000) {
+        /* ===== 6xnn : LD Vx, byte ===== */
+        case 0x6000: { 
+            uint8_t x  = (opcode & 0x0F00) >> 8;
+            uint8_t nn =  opcode & 0x00FF;
+            cpu->Vx[x] = nn;
+            break;
+        }
+        
+        
         /* ===== 00E0 : CLS ===== */
         case 0x0000:{
             if (opcode == 0x00E0) {
@@ -42,13 +51,7 @@ void cpu_cycle(CPU *cpu){
         }
 
 
-        /* ===== 6xkk : LD Vx, byte ===== */
-        case 0x6000: { 
-            uint8_t x  = (opcode & 0x0F00) >> 8;
-            uint8_t nn =  opcode & 0x00FF;
-            cpu->Vx[x] = nn;
-            break;
-        }
+
 
         /* ===== Annn : LD I, addr ===== */
         case 0xA000:{
